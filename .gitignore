@@ -1,0 +1,11 @@
+*.o
+*.a
+*.so
+.tmp/
+test_runner
+test0
+test1
+test2
+test3
+test4
+test5
