@@ -14,7 +14,9 @@
 
 # HOSTTYPE may be provided from the environment (e.g., HOSTTYPE=Testing)
 # Fallback to system architecture if not provided
-HOSTTYPE ?= $(shell uname -m)
+ifeq ($(HOSTTYPE),)
+HOSTTYPE := $(shell uname -m)_$(shell uname -s)
+endif
 
 NAME			= malloc
 # Build library name with optional _HOSTTYPE suffix (e.g., libft_malloc_Testing.so)
@@ -100,7 +102,7 @@ endef
 #                                   Rules                                      #
 # **************************************************************************** #
 
-all: lib $(LIB_NAME)
+all: lib $(LIB_NAME) symlink
 	@printf "$(GREEN)All targets compiled successfully!$(DEF_COLOR)\n"
 
 # Convenience target to create conventional symlink expected by scripts

@@ -7,9 +7,34 @@ void free(void *ptr)
     if (!ptr)
         return;
 
-    block = (t_block *)((char *)ptr - sizeof(t_block));
-    block->is_free = true;
+    pthread_mutex_lock(&g_heap.mutex);
 
-    // Merge adjacent free blocks
+    block = (t_block *)((char *)ptr - sizeof(t_block));
+
+    // If it's a LARGE allocation (blocks stored in g_heap.large), unmap it
+    t_block *prev = NULL;
+    t_block *cur = g_heap.large;
+    while (cur)
+    {
+        if (cur == block)
+        {
+            // unlink from large list
+            if (prev)
+                prev->next = cur->next;
+            else
+                g_heap.large = cur->next;
+            size_t total = sizeof(t_block) + cur->size;
+            munmap((void *)cur, total);
+            pthread_mutex_unlock(&g_heap.mutex);
+            return;
+        }
+        prev = cur;
+        cur = cur->next;
+    }
+
+    // Otherwise it's a TINY/SMALL block: mark free and try to merge
+    block->is_free = true;
     merge_blocks(block);
+
+    pthread_mutex_unlock(&g_heap.mutex);
 }

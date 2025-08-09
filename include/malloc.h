@@ -81,7 +81,9 @@ void    merge_blocks(t_block *block);
 
 void *allocate_from_zone(t_zone **zone, size_t size, size_t zone_size);
 
-
+/* Introspection/visualization */
+void show_alloc_mem(void);
+void show_alloc_mem_ex(void);
 
 void *ft_memcpy(void *dest, const void *src, size_t n);
 #endif
