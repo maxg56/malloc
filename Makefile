@@ -12,8 +12,13 @@
 
 # Variables
 
+# HOSTTYPE may be provided from the environment (e.g., HOSTTYPE=Testing)
+# Fallback to system architecture if not provided
+HOSTTYPE ?= $(shell uname -m)
+
 NAME			= malloc
-LIB_NAME		= libmalloc.so
+# Build library name with optional _HOSTTYPE suffix (e.g., libft_malloc_Testing.so)
+LIB_NAME		= libft_malloc$(if $(HOSTTYPE),_$(HOSTTYPE),).so
 
 INCLUDE			= include
 
@@ -97,6 +102,11 @@ endef
 
 all: lib $(LIB_NAME)
 	@printf "$(GREEN)All targets compiled successfully!$(DEF_COLOR)\n"
+
+# Convenience target to create conventional symlink expected by scripts
+symlink: $(LIB_NAME)
+	@ln -sf $(LIB_NAME) libft_malloc.so
+	@printf "$(GREEN)Symlink created: libft_malloc.so -> %s$(DEF_COLOR)\n" $(LIB_NAME)
 
 # **************************************************************************** #
 #                                   Library                                    #

@@ -1,0 +1,21 @@
+1.
+export HOSTTYPE=Testing
+make re
+ln -s libft_malloc_Testing.so libft_malloc.so
+ls -l libft_malloc.so
+nm -g libft_malloc.s
+
+2.
+gcc -o test0 test/test0.c && /usr/bin/time -v ./test0
+
+gcc -o test1 test/test1.c && /usr/bin/time -v ./test1
+
+3.
+chmod 777 run_linux.sh
+./run_linux.sh /usr/bin/time -v ./test0
+./run_linux.sh /usr/bin/time -v ./test1
+
+4.
+gcc -o test4 test/test4.c -L lft_malloc &&  ./run_linux.sh ./test4
+
+gcc -o test4 test/test5.c -L lft_malloc &&  ./run_linux.sh ./test5
