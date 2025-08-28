@@ -33,6 +33,17 @@ void free(void *ptr)
     }
 
     // Otherwise it's a TINY/SMALL block: mark free and try to merge
+    
+    /* Scribble freed memory if debug flag is set */
+    if (g_heap.debug.scribble)
+    {
+        void *user_ptr = (void *)((char *)block + sizeof(t_block));
+        scribble_memory(user_ptr, block->size, MALLOC_SCRIBBLE_FREE);
+    }
+    
+    /* Add to history */
+    add_to_history(ptr, block->size, false);
+    
     block->is_free = true;
     merge_blocks(block);
 

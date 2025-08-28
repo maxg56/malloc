@@ -17,6 +17,7 @@ void *allocate_from_zone(t_zone **zone, size_t size, size_t zone_size)
         (*zone)->blocks->size = zone_size - sizeof(t_zone) - sizeof(t_block);
         (*zone)->blocks->is_free = true;
         (*zone)->blocks->next = NULL;
+        (*zone)->blocks->alloc_time = 0;
     }
 
     // Try to find a free block in existing zones
@@ -31,6 +32,7 @@ void *allocate_from_zone(t_zone **zone, size_t size, size_t zone_size)
                 split_block(block, size);
             
             block->is_free = false;
+            block->alloc_time = time(NULL);
             return (void *)((char *)block + sizeof(t_block));
         }
         current_zone = current_zone->next;
@@ -46,6 +48,7 @@ void *allocate_from_zone(t_zone **zone, size_t size, size_t zone_size)
     new_zone->blocks->size = zone_size - sizeof(t_zone) - sizeof(t_block);
     new_zone->blocks->is_free = true;
     new_zone->blocks->next = NULL;
+    new_zone->blocks->alloc_time = 0;
     
     // Link the new zone to the existing chain
     new_zone->next = *zone;
@@ -57,6 +60,7 @@ void *allocate_from_zone(t_zone **zone, size_t size, size_t zone_size)
         split_block(block, size);
     
     block->is_free = false;
+    block->alloc_time = time(NULL);
     return (void *)((char *)block + sizeof(t_block));
 }
 
@@ -96,6 +100,7 @@ void *allocate_large(size_t size)
     new_block->size = size;
     new_block->is_free = false;
     new_block->next = g_heap.large;
+    new_block->alloc_time = time(NULL);
     
     // Add to the large blocks list
     g_heap.large = new_block;

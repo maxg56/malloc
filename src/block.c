@@ -53,6 +53,7 @@ t_block *split_block(t_block *block, size_t size)
         new_block->size = block->size - size - sizeof(t_block);
         new_block->is_free = true;
         new_block->next = block->next;
+        new_block->alloc_time = 0;
 
         block->size = size;
         block->is_free = false;
