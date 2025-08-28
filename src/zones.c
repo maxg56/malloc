@@ -13,8 +13,11 @@ void *allocate_from_zone(t_zone **zone, size_t size, size_t zone_size)
             return NULL;
         
         // Initialize the first block in the new zone
-        (*zone)->blocks = (t_block *)((char *)*zone + sizeof(t_zone));
-        (*zone)->blocks->size = zone_size - sizeof(t_zone) - sizeof(t_block);
+        char *zone_start = (char *)*zone + sizeof(t_zone);
+        char *aligned_start = (char *)((((uintptr_t)zone_start) + (ALIGNMENT - 1)) & ~(ALIGNMENT - 1));
+        (*zone)->blocks = (t_block *)aligned_start;
+        size_t used_space = aligned_start - (char *)*zone;
+        (*zone)->blocks->size = zone_size - used_space - sizeof(t_block);
         (*zone)->blocks->is_free = true;
         (*zone)->blocks->next = NULL;
         (*zone)->blocks->alloc_time = 0;
@@ -44,8 +47,11 @@ void *allocate_from_zone(t_zone **zone, size_t size, size_t zone_size)
         return NULL;
     
     // Initialize the first block in the new zone
-    new_zone->blocks = (t_block *)((char *)new_zone + sizeof(t_zone));
-    new_zone->blocks->size = zone_size - sizeof(t_zone) - sizeof(t_block);
+    char *zone_start = (char *)new_zone + sizeof(t_zone);
+    char *aligned_start = (char *)((((uintptr_t)zone_start) + (ALIGNMENT - 1)) & ~(ALIGNMENT - 1));
+    new_zone->blocks = (t_block *)aligned_start;
+    size_t used_space = aligned_start - (char *)new_zone;
+    new_zone->blocks->size = zone_size - used_space - sizeof(t_block);
     new_zone->blocks->is_free = true;
     new_zone->blocks->next = NULL;
     new_zone->blocks->alloc_time = 0;
