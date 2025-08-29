@@ -171,18 +171,22 @@ static void print_hex_dump(void *ptr, size_t size)
 
 static void show_allocation_history(void)
 {
-    t_alloc_history *entry;
     int count = 0;
     
-    if (!g_heap.debug.stack_logging || !g_heap.history)
+    if (!g_heap.debug.stack_logging || g_heap.history_count == 0)
     {
         putstr("Allocation history: disabled (set MALLOC_STACK_LOGGING=1)\n");
         return;
     }
     
     putstr("=== Allocation History ===\n");
-    for (entry = g_heap.history; entry && count < 20; entry = entry->next, count++)
+    
+    // Afficher les dernières entrées du buffer statique
+    size_t max_entries = g_heap.history_count < MAX_ALLOC_HISTORY ? g_heap.history_count : MAX_ALLOC_HISTORY;
+    for (size_t i = 0; i < max_entries && count < 20; i++, count++)
     {
+        t_alloc_history *entry = &g_heap.history_buffer[i];
+        
         if (entry->is_freed)
             putstr("FREE  ");
         else

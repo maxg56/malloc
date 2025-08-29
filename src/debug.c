@@ -17,30 +17,27 @@ void init_debug_flags(void)
     else
         g_heap.debug.check_level = 0;
 
-    /* Initialize history */
-    g_heap.history = NULL;
-    g_heap.history_count = 0;
+    /* History buffer is statically allocated, no need to initialize */
 }
 
 void add_to_history(void *ptr, size_t size, bool is_alloc)
 {
     t_alloc_history *new_entry;
 
+    // Ne pas allouer d'historique si pas nécessaire pour économiser des pages
     if (!g_heap.debug.stack_logging || g_heap.history_count >= MAX_ALLOC_HISTORY)
         return;
 
-    new_entry = mmap(NULL, sizeof(t_alloc_history), PROT_READ | PROT_WRITE,
-                     MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
-    if (new_entry == MAP_FAILED)
-        return;
+    // Utiliser le buffer statique au lieu de mmap pour économiser des pages
+    size_t index = g_heap.history_count % MAX_ALLOC_HISTORY;
+    new_entry = &g_heap.history_buffer[index];
 
     new_entry->ptr = ptr;
     new_entry->size = size;
     new_entry->timestamp = time(NULL);
     new_entry->is_freed = !is_alloc;
-    new_entry->next = g_heap.history;
+    new_entry->next = NULL;  // Plus besoin de linked list
 
-    g_heap.history = new_entry;
     g_heap.history_count++;
 }
 

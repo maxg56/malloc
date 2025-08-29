@@ -6,7 +6,7 @@ t_heap g_heap = {
     .large = NULL,
     .mutex = PTHREAD_MUTEX_INITIALIZER,
     .debug = {false, false, false, false, 0},
-    .history = NULL,
+    .history_buffer = {{0}},  // Buffer statique initialisé
     .history_count = 0
 };
 

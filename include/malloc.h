@@ -1,6 +1,7 @@
 #ifndef MALLOC_H
 # define MALLOC_H
 
+# define _GNU_SOURCE
 # include <sys/mman.h>
 # include <unistd.h>
 # include <pthread.h>
@@ -16,8 +17,8 @@
 # define SMALL_MAX      4096
 
 # define PAGE_SIZE      getpagesize()
-# define TINY_ZONE_SIZE  (PAGE_SIZE * 16)   // 64 Ko
-# define SMALL_ZONE_SIZE (PAGE_SIZE * 128)  // 512 Ko
+# define TINY_ZONE_SIZE  (PAGE_SIZE * 4)    // 16 Ko - Réduit de 64Ko
+# define SMALL_ZONE_SIZE (PAGE_SIZE * 32)   // 128 Ko - Réduit de 512Ko
 
 # define ALIGNMENT 16
 # define ALIGN(size) (((size) + (ALIGNMENT - 1)) & ~(ALIGNMENT - 1))
@@ -62,7 +63,7 @@ typedef struct s_heap {
     t_block             *large;
     pthread_mutex_t     mutex;
     t_debug_flags       debug;
-    t_alloc_history     *history;
+    t_alloc_history     history_buffer[MAX_ALLOC_HISTORY];  // Buffer statique
     size_t              history_count;
 } t_heap;
 
