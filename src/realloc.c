@@ -42,7 +42,6 @@ void *realloc(void *ptr, size_t size)
         void *new_block = mremap(block, old_total, new_total, MREMAP_MAYMOVE);
         if (new_block != MAP_FAILED)
         {
-            // Mettre à jour le pointeur dans la liste large si l'adresse a changé
             if (new_block != block)
             {
                 t_block *prev = NULL;
