@@ -170,11 +170,15 @@ $(OBJF):
 
 test: $(LIB_NAME) $(TEST_RUNNER)
 	@printf "$(CYAN)Running unit tests...$(DEF_COLOR)\n"
-	@LD_LIBRARY_PATH=. ./$(TEST_RUNNER)
+	@LD_LIBRARY_PATH=. LD_PRELOAD=./$(LIB_NAME) ./$(TEST_RUNNER)
 
-$(TEST_RUNNER): $(TEST_SRC) $(LIB_NAME)
+test-overhead: $(LIB_NAME)
+	@printf "$(CYAN)Running page overhead tests...$(DEF_COLOR)\n"
+	@./test/test_page_overhead.sh
+
+$(TEST_RUNNER): $(TEST_SRC)
 	@printf "$(MAGENTA)Compiling test runner...$(DEF_COLOR)\n"
-	@$(CC) $(CFLAGS) -I $(INCLUDE) $(TEST_SRC) -L. -l:$(LIB_NAME) -o $(TEST_RUNNER)
+	@$(CC) $(CFLAGS) -I $(INCLUDE) $(TEST_SRC) -o $(TEST_RUNNER)
 
 test-clean:
 	@$(RM) $(TEST_RUNNER) $(TEST_OBJ)

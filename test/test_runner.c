@@ -22,6 +22,7 @@ int main(void)
     test_multiple_allocations();
     test_fragmentation();
     test_stress_test();
+    test_page_overhead();
     
     // Print summary
     TEST_SUMMARY();

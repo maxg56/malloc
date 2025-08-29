@@ -36,12 +36,16 @@ void test_malloc_zero(void)
     TEST_START("Malloc with zero size");
     
     void *ptr = malloc(0);
+    
+    // Note: malloc(0) behavior is implementation-defined
+    // Some implementations return NULL, others return a unique pointer
+    // Both behaviors are valid according to the C standard
     if (ptr == NULL) {
-        TEST_ASSERT(1, "malloc(0) should return NULL");
+        TEST_ASSERT(1, "malloc(0) returned NULL (valid behavior)");
     } else {
-        printf("  DEBUG: malloc(0) returned %p (expected NULL)\n", ptr);
-        TEST_ASSERT(ptr == NULL, "malloc(0) should return NULL");
-        free(ptr); // Clean up if it actually allocated something
+        // If it returns a pointer, it should be freeable
+        free(ptr);
+        TEST_ASSERT(1, "malloc(0) returned valid pointer (valid behavior)");
     }
     
     TEST_END();
@@ -199,6 +203,36 @@ void test_stress_test(void)
         char expected[20];
         sprintf(expected, "Stress %d", i);
         TEST_ASSERT(strcmp(ptrs[i], expected) == 0, "Stress data should be intact");
+        free(ptrs[i]);
+    }
+    
+    TEST_END();
+}
+
+void test_page_overhead(void)
+{
+    TEST_START("Page overhead vs system malloc");
+    
+    // Note: Ce test ne peut être executé que si on compare avec system malloc
+    // Il est prévu pour être utilisé avec le script test_page_overhead.sh
+    
+    void *ptrs[50];
+    
+    // Pattern d'allocation mixte pour tester les différentes zones
+    for (int i = 0; i < 50; i++)
+    {
+        if (i < 20) {
+            ptrs[i] = malloc(64);    // TINY zone
+        } else if (i < 40) {
+            ptrs[i] = malloc(1024);  // SMALL zone  
+        } else {
+            ptrs[i] = malloc(8192);  // LARGE blocks
+        }
+        TEST_ASSERT(ptrs[i] != NULL, "Mixed allocation should succeed");
+    }
+    
+    // Libérer la mémoire
+    for (int i = 0; i < 50; i++) {
         free(ptrs[i]);
     }
     

@@ -74,5 +74,6 @@ void test_realloc_zero(void);
 void test_multiple_allocations(void);
 void test_fragmentation(void);
 void test_stress_test(void);
+void test_page_overhead(void);
 
 #endif
